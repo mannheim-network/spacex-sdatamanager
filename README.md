@@ -38,7 +38,7 @@ Simple tasks are speciualized tasks which runs periodly. Currently sDataManager 
 1. Clone repo
 
 ```shell
-git clone https://github.com/spacexio/spacex-sdatamanager.git
+git clone https://github.com/mannheim-network/spacex-sdatamanager
 ```
 
 2. Installing
