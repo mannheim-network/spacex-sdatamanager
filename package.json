@@ -1,6 +1,6 @@
 {
   "name": "spacex-sdatamanager",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "A storage manager integrated with SpaceX, IPFS and storager(storage inspector) of SpaceX protocol.",
   "main": "build/src/main.js",
   "repository": "https://github.com/spacexio/spacex-sdatamanager.git",
