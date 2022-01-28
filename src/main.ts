@@ -6,7 +6,7 @@ import { loadDb } from './db';
 import { createIndexingTasks } from './indexing';
 import IpfsApi from './ipfs';
 import { makeSealCoordinatorApiFromConfig } from './services/seal-coordinator';
-import StoragerApi from './storager';
+import StorageApi from './storage';
 import { createSimpleTasks } from './tasks';
 import { createChainHeightLogger } from './tasks/chain-height-logger-task';
 import { AppContext } from './types/context';
@@ -18,7 +18,7 @@ import { timeout, timeoutOrError } from './utils/promise-utils';
 
 const MaxTickTimout = 15 * 1000;
 const IpfsTimeout = 8000 * 1000; // 8000s
-const StoragerTimeout = 8000 * 1000; //8000s
+const StorageTimeout = 8000 * 1000; //8000s
 const ConfigFile = process.env['SDATAMANAGER_CONFIG'] || 'sdatamanager-config.json';
 const MaxNoNewBlockDuration = Dayjs.duration({
   minutes: 30,
@@ -46,7 +46,7 @@ async function main() {
 
   const database = await loadDb(config);
   const ipfsApi = new IpfsApi(config.ipfs.endPoint, IpfsTimeout);
-  const storagerApi = new StoragerApi(config.storager.endPoint, StoragerTimeout);
+  const storageApi = new StorageApi(config.storage.endPoint, StorageTimeout);
   const sealCoordinator = await makeSealCoordinatorApiFromConfig(
     config,
     logger,
@@ -60,7 +60,7 @@ async function main() {
     nodeInfo: null,
     groupInfo: null,
     ipfsApi,
-    storagerApi,
+    storageApi,
     sealCoordinator,
     startTime: Dayjs(),
   };

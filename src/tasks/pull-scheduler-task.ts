@@ -44,7 +44,7 @@ async function handlePulling(
     return;
   }
 
-  const [storagerFree, sysFree] = await getFreeSpace(context);
+  const [storageFree, sysFree] = await getFreeSpace(context);
   const maxFilesPerRound = 100;
   const fileOrderOps = createFileOrderOperator(database);
   const noRecordStrategies = new Set();
@@ -110,12 +110,12 @@ async function handlePulling(
       continue;
     }
 
-    if (!isDiskEnoughForFile(record.size, totalSize, storagerFree, sysFree)) {
+    if (!isDiskEnoughForFile(record.size, totalSize, storageFree, sysFree)) {
       logger.info(
-        'disk space is not enough for file %s, total size: %s, storager free %s, sysFree: %s',
+        'disk space is not enough for file %s, total size: %s, storage free %s, sysFree: %s',
         record.cid,
         totalSize,
-        storagerFree,
+        storageFree,
         sysFree,
       );
       await fileOrderOps.updateFileInfoStatus(record.id, 'insufficient_space');
@@ -133,7 +133,7 @@ async function handlePulling(
 }
 
 async function isReady(context: AppContext, logger: Logger): Promise<boolean> {
-  const { config, storagerApi } = context;
+  const { config, storageApi } = context;
   if (!context.groupInfo) {
     logger.info('group info not loaded, skip this round');
     return false;
@@ -143,7 +143,7 @@ async function isReady(context: AppContext, logger: Logger): Promise<boolean> {
     return false;
   }
   if (config.scheduler.minSrdRatio > 0) {
-    const workload = await storagerApi.workload();
+    const workload = await storageApi.workload();
     const total = workload.srd.srd_complete + workload.srd.disk_available;
     const srdRatio = total > 0 ? (workload.srd.srd_complete * 100) / total : 0;
     if (srdRatio < config.scheduler.minSrdRatio) {
@@ -154,17 +154,17 @@ async function isReady(context: AppContext, logger: Logger): Promise<boolean> {
       return false;
     }
   }
-  return await isStoragerReady(context, logger);
+  return await isStorageReady(context, logger);
 }
 
-async function isStoragerReady(
+async function isStorageReady(
   context: AppContext,
   logger: Logger,
 ): Promise<boolean> {
   const { api } = context;
   const storageIdentity = await api.storageIdentity();
   if (!storageIdentity) {
-    logger.warn('⚠️ Please wait your storager to report the first work report');
+    logger.warn('⚠️ Please wait your storage to report the first work report');
     return false;
   }
 
@@ -225,7 +225,7 @@ async function getOneFileByStrategy(
     const status = await filterFile(record, strategy, blockAndTime, context);
     switch (status) {
       case 'good':
-        if (await isSealDone(record.cid, context.storagerApi, logger)) {
+        if (await isSealDone(record.cid, context.storageApi, logger)) {
           await fileOrderOps.updateFileInfoStatus(record.id, 'handled');
           break;
         }
@@ -278,9 +278,9 @@ async function getOneFileByStrategy(
 
 //
 // return free space in MB
-// returns (storager free, sys free)
+// returns (storage free, sys free)
 async function getFreeSpace(context: AppContext): Promise<[number, number]> {
-  const [freeGBSize, sysFreeGBSize] = await context.storagerApi.free();
+  const [freeGBSize, sysFreeGBSize] = await context.storageApi.free();
   return [gbToMb(freeGBSize), gbToMb(sysFreeGBSize)];
 }
 

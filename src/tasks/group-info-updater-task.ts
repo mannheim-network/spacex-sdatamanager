@@ -9,7 +9,7 @@ async function handleUpdate(context: AppContext, logger: Logger) {
   try {
     const storageIdentity = await api.storageIdentity();
     if (!storageIdentity) {
-      logger.warn('⚠️ no storager identity');
+      logger.warn('⚠️ no storage identity');
       return;
     }
     const groupOwner = storageIdentity.group;

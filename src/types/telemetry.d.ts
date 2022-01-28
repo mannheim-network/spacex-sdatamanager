@@ -5,14 +5,14 @@ export interface TelemetryData {
   chainAccount: string;
   smangerInfo: SMangerInfo;
   pinStats: PinStats;
-  storager: StoragerStats | null;
+  storage: StorageStats | null;
   queueStats: QueueInfo;
   cleanupStats: CleanupStats;
   groupInfo: GroupInfo;
   hasSealCoordinator: boolean;
 }
 
-export interface StoragerStats {
+export interface StorageStats {
   files: {
     lost: {
       num: number;

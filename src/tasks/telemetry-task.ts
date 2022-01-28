@@ -1,18 +1,18 @@
 import axios from 'axios';
 import _ from 'lodash';
 import { Logger } from 'winston';
-import StoragerApi from '../storager';
+import StorageApi from '../storage';
 import { AppContext } from '../types/context';
 import { PinStatus } from '../types/database';
 import { NormalizedConfig } from '../types/sdatamanager-config';
-import { WorkloadInfo } from '../types/storager';
+import { WorkloadInfo } from '../types/storage';
 import { SimpleTask } from '../types/tasks';
 import {
   PinStats,
   QueueInfo,
   SDataManagerInfo,
   TelemetryData,
-  StoragerStats,
+  StorageStats,
 } from '../types/telemetry';
 import { formatError, getTimestamp, toQuotedList } from '../utils';
 import { Dayjs } from '../utils/datetime';
@@ -30,7 +30,7 @@ async function handleReport(context: AppContext, logger: Logger) {
     return;
   }
   const stats = await collectStats(context, logger);
-  if (stats.storager) {
+  if (stats.storage) {
     logger.info('reporting stats to telemtry: %o', stats);
     try {
       const resp = await axios.post(telemetryUrl, stats, {
@@ -41,7 +41,7 @@ async function handleReport(context: AppContext, logger: Logger) {
       logger.warn('telemetry report failed');
     }
   } else {
-    logger.info('not report to telemetry, storager is offline');
+    logger.info('not report to telemetry, storage is offline');
   }
 }
 
@@ -49,7 +49,7 @@ async function collectStats(
   context: AppContext,
   logger: Logger,
 ): Promise<TelemetryData> {
-  const { api, config, database, storagerApi } = context;
+  const { api, config, database, storageApi } = context;
   const account = api.getChainAccount();
   const smangerInfo = collectSDataManagerInfo(config, context);
 
@@ -62,8 +62,8 @@ async function collectStats(
       where status = "done" and last_updated > ? `,
     [timeStart],
   );
-  const workload = await getStoragerWorkload(storagerApi, logger);
-  let reportWL: StoragerStats;
+  const workload = await getStorageWorkload(storageApi, logger);
+  let reportWL: StorageStats;
   if (workload) {
     reportWL = {
       srd: {
@@ -85,7 +85,7 @@ async function collectStats(
     chainAccount: account,
     smangerInfo,
     pinStats,
-    storager: reportWL,
+    storage: reportWL,
     groupInfo: context.groupInfo || {
       groupAccount: '',
       totalMembers: 0,
@@ -99,14 +99,14 @@ async function collectStats(
   };
 }
 
-async function getStoragerWorkload(
-  storagerApi: StoragerApi,
+async function getStorageWorkload(
+  storageApi: StorageApi,
   logger: Logger,
 ): Promise<WorkloadInfo | null> {
   try {
-    return await storagerApi.workload();
+    return await storageApi.workload();
   } catch (e) {
-    logger.error('failed to load storager workload: %s', formatError(e));
+    logger.error('failed to load storage workload: %s', formatError(e));
     return null;
   }
 }

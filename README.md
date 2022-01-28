@@ -25,7 +25,7 @@ Indexers extract information into the local database from various data sources. 
 
 ### Simple Tasks
 Simple tasks are speciualized tasks which runs periodly. Currently sDataManager has implemented below tasks:
-1. **Group Info Updater**: Update storager identity information from storager api.
+1. **Group Info Updater**: Update storage identity information from storage api.
 2. **Ipfs Gc**: Schedule ipfs gc periodly.
 3. **Telemetry Reporting**: Report sDataManager statistics information to the telemetry server.
 4. **Pull Scheduler**: Schedule file pulling based on configured strategey.
@@ -72,7 +72,7 @@ Those config items will be configured in the sDataManager configuration setup pr
 
 * chain.account: your member account
 * chain.endPoint: your chain endpoint
-* storager.endPoint: your storager endpoint
+* storage.endPoint: your storage endpoint
 * ipfs.endPoint: your IPFS endpoint
 * dataDir: the directory of the database of sDataManager
 * scheduler.minSrdRatio: a minimum ratio of SRD that one node can start to accept storage orders.

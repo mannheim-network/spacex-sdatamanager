@@ -3,7 +3,7 @@ export interface ChainConfig {
   endPoint: string;
 }
 
-export interface StoragerConfig {
+export interface StorageConfig {
   endPoint: string;
 }
 
@@ -45,7 +45,7 @@ export interface SealCoordinatorConfig {
 
 export interface SDataManagerConfig {
   chain: ChainConfig;
-  storager: StoragerConfig;
+  storage: StorageConfig;
   ipfs: IpfsConfig;
   node: NodeConfig;
   telemetry: TelemetryConfig;

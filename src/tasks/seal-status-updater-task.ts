@@ -3,7 +3,7 @@ import { Logger } from 'winston';
 import { createPinRecordOperator } from '../db/pin-record';
 import { AppContext } from '../types/context';
 import { PinRecord, PinRecordOperator } from '../types/database';
-import { SealInfoMap } from '../types/storager';
+import { SealInfoMap } from '../types/storage';
 import { SimpleTask } from '../types/tasks';
 import { getTimestamp } from '../utils';
 import { isSealDone } from './pull-utils';
@@ -19,9 +19,9 @@ async function handleUpdate(
   logger: Logger,
   isStopped: IsStopped,
 ) {
-  const { database, storagerApi } = context;
+  const { database, storageApi } = context;
   const pinRecordOps = createPinRecordOperator(database);
-  const pendingFiles = await storagerApi.pendings();
+  const pendingFiles = await storageApi.pendings();
   const sealingRecords = await pinRecordOps.getSealingRecords();
   logger.info('checking %d sealing records', sealingRecords.length);
   for (const r of sealingRecords) {
@@ -51,7 +51,7 @@ async function checkAndUpdateStatus(
     return;
   }
 
-  const { storagerApi } = context;
+  const { storageApi } = context;
   // cid in seal info map, means it's being sealed
   // need to check the seal progress
   if (_.has(sealInfoMap, record.cid)) {
@@ -76,7 +76,7 @@ async function checkAndUpdateStatus(
     }
   } else {
     // cid not in seal info map, either means sealing is done or sealing is not started
-    const done = await isSealDone(record.cid, storagerApi, logger);
+    const done = await isSealDone(record.cid, storageApi, logger);
     if (!done) {
       logger.info('sealing blocked for file "%s", cancel sealing', record.cid);
       await markRecordAsFailed(record, pinRecordOps, context, logger, false);
@@ -92,17 +92,17 @@ async function markRecordAsFailed(
   pinRecordOps: PinRecordOperator,
   context: AppContext,
   logger: Logger,
-  endStorager: boolean,
+  endStorage: boolean,
 ) {
-  const { storagerApi } = context;
+  const { storageApi } = context;
   if (_.has(context.cancelationTokens, record.cid)) {
     logger.info('aborting pin request for file: "%s"', record.cid);
     context.cancelationTokens[record.cid].abort();
     delete context.cancelationTokens[record.cid];
   }
   await pinRecordOps.updatePinRecordStatus(record.id, 'failed');
-  if (endStorager) {
-    await storagerApi.sealEnd(record.cid);
+  if (endStorage) {
+    await storageApi.sealEnd(record.cid);
   }
 }
 

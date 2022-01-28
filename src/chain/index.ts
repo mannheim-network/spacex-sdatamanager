@@ -193,7 +193,7 @@ export default class SpaceXApi {
   }
 
   /**
-   * Get storager identity
+   * Get storage identity
    * @returns Identity or Null
    */
   async storageIdentity(): Promise<Identity | null> {

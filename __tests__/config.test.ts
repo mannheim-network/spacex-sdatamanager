@@ -8,8 +8,8 @@ const defaultConfig: SDataManagerConfig = {
     account: 'test',
     endPoint: 'chain',
   },
-  storager: {
-    endPoint: 'storager',
+  storage: {
+    endPoint: 'storage',
   },
   ipfs: {
     endPoint: 'ipfs',

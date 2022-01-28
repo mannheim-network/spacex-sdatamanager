@@ -8,7 +8,7 @@ import { BlockAndTime, estimateTimeAtBlock } from '../utils/chain-math';
 import { AppContext } from '../types/context';
 import seedrandom from 'seedrandom';
 import _ from 'lodash';
-import StoragerApi from '../storager';
+import StorageApi from '../storage';
 import { Logger } from 'winston';
 import { logger } from '../utils/logger';
 
@@ -130,14 +130,14 @@ export function cidToBigNumber(cid: string): BigNumber {
 export function isDiskEnoughForFile(
   fileSize: number,
   pendingSize: number,
-  storagerFree: number,
+  storageFree: number,
   sysFree: number,
 ): boolean {
   if (sysFree < SysMinFreeSpace) {
     return false;
   }
 
-  return storagerFree >= (fileSize + pendingSize) * 2.2;
+  return storageFree >= (fileSize + pendingSize) * 2.2;
 }
 
 /**
@@ -175,16 +175,16 @@ function rdm(seed: string): number {
 
 export async function isSealDone(
   cid: string,
-  storagerApi: StoragerApi,
+  storageApi: StorageApi,
   logger: Logger,
 ): Promise<boolean> {
   try {
     // ipfs pin returns quickly if the sealing is done, otherwise it will timeout
-    const ret = await storagerApi.getSealInfo(cid);
+    const ret = await storageApi.getSealInfo(cid);
     return ret && (ret.type === 'valid' || ret.type === 'lost');
   } catch (ex) {
     logger.error(
-      'unexpected error while calling storager api: %s',
+      'unexpected error while calling storage api: %s',
       formatError(ex),
     );
     throw ex;

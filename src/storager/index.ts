@@ -5,15 +5,15 @@ import {
   SealInfoMap,
   SealInfoResp,
   WorkloadInfo,
-} from '../types/storager';
+} from '../types/storage';
 import { parseObj } from '../utils';
 
-export default class StoragerApi {
-  private readonly storager: AxiosInstance;
+export default class StorageApi {
+  private readonly storage: AxiosInstance;
 
-  constructor(storagerAddr: string, to: number) {
-    this.storager = axios.create({
-      baseURL: storagerAddr + '/api/v0',
+  constructor(storageAddr: string, to: number) {
+    this.storage = axios.create({
+      baseURL: storageAddr + '/api/v0',
       timeout: to,
       headers: { 'Content-Type': 'application/json' },
     });
@@ -24,11 +24,11 @@ export default class StoragerApi {
    * End file by cid
    * @param cid ipfs cid
    * @returns End success or failed
-   * @throws storager api error | timeout
+   * @throws storage api error | timeout
    */
   async sealEnd(cid: string): Promise<boolean> {
     try {
-      const res = await this.storager.post(
+      const res = await this.storage.post(
         '/storage/seal_end',
         JSON.stringify({ cid: cid }),
       );
@@ -44,7 +44,7 @@ export default class StoragerApi {
       const searchParams = qs.stringify({
         cid,
       });
-      const res = await this.storager.get<QuerySealInfoResult>(
+      const res = await this.storage.get<QuerySealInfoResult>(
         `/file/info?${searchParams}`,
       );
 
@@ -64,11 +64,11 @@ export default class StoragerApi {
    * Delete file by cid
    * @param cid ipfs cid
    * @returns delete success or failed
-   * @throws storager api error | timeout
+   * @throws storage api error | timeout
    */
   async delete(cid: string): Promise<boolean> {
     try {
-      const res = await this.storager.post(
+      const res = await this.storage.post(
         '/storage/delete',
         JSON.stringify({ cid: cid }),
       );
@@ -80,9 +80,9 @@ export default class StoragerApi {
   }
 
   async workload(): Promise<WorkloadInfo> {
-    const res = await this.storager.get('/workload');
+    const res = await this.storage.get('/workload');
     if (!res || res.status !== 200) {
-      throw new Error(`invalid storager response: ${res}`);
+      throw new Error(`invalid storage response: ${res}`);
     }
     return parseObj(res.data);
   }
@@ -91,7 +91,7 @@ export default class StoragerApi {
   /**
    * Query local free storage size
    * @returns (free space size(GB), system free space(GB))
-   * @throws storager api error | timeout
+   * @throws storage api error | timeout
    */
   async free(): Promise<[number, number]> {
     const workload = await this.workload();
@@ -108,10 +108,10 @@ export default class StoragerApi {
    */
   // eslint-disable-next-line
   async pendings(): Promise<SealInfoMap> {
-    const res = await this.storager.get('/file/info_by_type?type=pending');
+    const res = await this.storage.get('/file/info_by_type?type=pending');
     if (res && res.status === 200) {
       return parseObj(res.data);
     }
-    throw new Error(`storager request failed with status: ${res.status}`);
+    throw new Error(`storage request failed with status: ${res.status}`);
   }
 }

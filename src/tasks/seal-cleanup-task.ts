@@ -14,11 +14,11 @@ const CleanupInterval = Dayjs.duration({
 
 /**
  * task to cleanup seal tasks from unknow source
- * a task is from unknown source if it's in storager's sealing queue
+ * a task is from unknown source if it's in storage's sealing queue
  * but there is no pending pin record for it.
  */
 async function handleTick(context: AppContext, logger: Logger) {
-  const { database, storagerApi } = context;
+  const { database, storageApi } = context;
   const configOps = createConfigOps(database);
   const lastCleanupTime = await configOps.readTime(KeyLastSealTaskCleanupTime);
   if (!lastCleanupTime) {
@@ -37,7 +37,7 @@ async function handleTick(context: AppContext, logger: Logger) {
     return;
   }
   const pinRecordOps = createPinRecordOperator(database);
-  const pendingFiles = await storagerApi.pendings();
+  const pendingFiles = await storageApi.pendings();
   const pendingPins = await pinRecordOps.getSealingRecords();
   const pendingPinMap = _.keyBy(pendingPins, (p) => p.cid);
   const unknownPins = _.chain(pendingFiles)
@@ -47,11 +47,11 @@ async function handleTick(context: AppContext, logger: Logger) {
     })
     .value();
   for (const cid of unknownPins) {
-    logger.info('removing "%s" from storager', cid);
-    await storagerApi.sealEnd(cid);
+    logger.info('removing "%s" from storage', cid);
+    await storageApi.sealEnd(cid);
   }
   logger.info(
-    "%d seal tasks are removed from storager's sealing queue",
+    "%d seal tasks are removed from storage's sealing queue",
     _.size(unknownPins),
   );
   await configOps.saveTime(KeyLastSealTaskCleanupTime, Dayjs());

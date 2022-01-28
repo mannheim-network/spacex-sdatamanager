@@ -7,7 +7,7 @@ const chainConfigSchema = Joi.object().keys({
   endPoint: Joi.string().required(),
 });
 
-const storagerConfigSchema = Joi.object().keys({
+const storageConfigSchema = Joi.object().keys({
   endPoint: Joi.string().required(),
 });
 
@@ -53,7 +53,7 @@ const sealCoordinatorConfig = Joi.object().keys({
 const configSchema = Joi.object()
   .keys({
     chain: chainConfigSchema.required(),
-    storager: storagerConfigSchema.required(),
+    storage: storageConfigSchema.required(),
     ipfs: ipfsConfigSchema.required(),
     node: nodeConfigSchema.required(),
     telemetry: telemetryConfigSchema.required(),

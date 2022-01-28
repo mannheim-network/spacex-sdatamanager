@@ -2,7 +2,7 @@ import { Dayjs } from 'dayjs';
 import { Database } from 'sqlite';
 import SpaceXApi from '../chain';
 import IpfsApi from '../ipfs';
-import StoragerApi from '../storager';
+import StorageApi from '../storage';
 import { SealCoordinatorApi } from './seal-coordinator';
 import { NormalizedConfig } from './sdatamanager-config';
 
@@ -21,7 +21,7 @@ export interface AppContext {
   api: SpaceXApi;
   database: Database;
   ipfsApi: IpfsApi;
-  storagerApi: StoragerApi;
+  storageApi: StorageApi;
   nodeInfo: NodeInfo | null;
   groupInfo: GroupInfo | null;
   sealCoordinator: SealCoordinatorApi | null;

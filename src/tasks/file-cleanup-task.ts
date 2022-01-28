@@ -1,5 +1,5 @@
 /**
- * a simple task to delete files from storager
+ * a simple task to delete files from storage
  */
 
 import Bluebird from 'bluebird';
@@ -17,7 +17,7 @@ async function handleCleanup(
   logger: Logger,
   isStopped: IsStopped,
 ) {
-  const { database, storagerApi } = context;
+  const { database, storageApi } = context;
   const fileOrderOp = createFileOrderOperator(database);
 
   let filesCleaned = 0;
@@ -34,7 +34,7 @@ async function handleCleanup(
           // notify seal coordinator that we're unsealing this file
           await context.sealCoordinator.unMarkSeal(f.cid);
         }
-        const deleted = await storagerApi.delete(f.cid);
+        const deleted = await storageApi.delete(f.cid);
         const status = deleted ? 'done' : 'failed';
         await fileOrderOp.updateCleanupRecordStatus(f.id, status);
       } catch (e) {
